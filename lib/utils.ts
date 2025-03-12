@@ -29,3 +29,13 @@ export const handleFileChange = (fileProp: File | undefined) => {
     }
   });
 };
+
+export const generateValidationStyles = (
+  value: string,
+  min: number,
+  max: number
+) => {
+  if (!value) return "text-[#6C757D]";
+  if (value.length < min || value.length > 255) return "text-red";
+  return "text-green-500";
+};
