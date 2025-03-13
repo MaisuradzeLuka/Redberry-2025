@@ -4,7 +4,7 @@ import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { FormInputType } from "@/lib/types";
 
-const FormInput = ({ name, form, label }: FormInputType) => {
+const FormInput = ({ name, form, label, min, max }: FormInputType) => {
   return (
     <FormField
       control={form.control}
@@ -29,21 +29,21 @@ const FormInput = ({ name, form, label }: FormInputType) => {
             <p
               className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
                 field.value,
-                2,
-                255
+                min!,
+                max!
               )}`}
             >
-              <MdOutlineDone /> მინიმუმ 2 სიმბოლო
+              <MdOutlineDone /> მინიმუმ {min} სიმბოლო
             </p>
 
             <p
               className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
                 field.value,
-                2,
-                255
+                min!,
+                max!
               )}`}
             >
-              <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო
+              <MdOutlineDone /> მაქსიმუმ {max} სიმბოლო
             </p>
           </div>
         </FormItem>

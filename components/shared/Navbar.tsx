@@ -13,7 +13,7 @@ const Navbar = () => {
 
       <div>
         <Dialog>
-          <DialogTrigger className="text-[16px] px-5 py-3 border rounded-md border-primaryPurple mr-10">
+          <DialogTrigger className="text-[16px] px-5 py-3 border rounded-md border-primaryPurple mr-10 cursor-pointer">
             თანამშრომლის შექმნა
           </DialogTrigger>
 

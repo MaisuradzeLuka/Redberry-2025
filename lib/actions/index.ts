@@ -33,6 +33,7 @@ export const postData = async (additionalUrl: string, body: any) => {
       body: body,
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${TOKEN}`,
       },
     });

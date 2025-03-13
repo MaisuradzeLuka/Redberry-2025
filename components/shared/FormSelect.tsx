@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FormSelectType } from "@/lib/types";
+import Image from "next/image";
 
 const FormSelect = ({
   name,
@@ -16,52 +17,69 @@ const FormSelect = ({
   placeholder,
   options,
   defaultValue,
+  className,
+  dissabled,
 }: FormSelectType) => {
   return (
     <FormField
       control={form.control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="self-start w-full flex flex-col gap-2 ">
-          <FormLabel className="text-sm text-[#343A40] font-medium border-none">
-            {label}
-          </FormLabel>
-          <Select
-            onValueChange={(value) => field.onChange(Number(value))}
-            defaultValue={field.value}
+      defaultValue={defaultValue}
+      render={({ field }) => {
+        return (
+          <FormItem
+            className={`self-start w-full flex flex-col gap-2 ${className}`}
           >
-            <FormControl>
-              <SelectTrigger
-                className={`w-full h-10 border-[#CED4DA] !ring-0 ${
-                  form.formState.errors[name]
-                    ? "border-red"
-                    : form.getFieldState(name).isDirty
-                    ? "border-green-500"
-                    : ""
-                }`}
-              >
-                <SelectValue
-                  placeholder={placeholder}
-                  defaultValue={defaultValue}
+            <FormLabel
+              className={`text-sm ${
+                dissabled ? "text-[#ADB5BD]" : "text-[#343A40]"
+              } font-medium border-none`}
+            >
+              {label}
+            </FormLabel>
+            <Select
+              onValueChange={(value) => field.onChange(Number(value))}
+              defaultValue={defaultValue}
+              disabled={dissabled}
+            >
+              <FormControl>
+                <SelectTrigger
+                  className={`w-full h-10 border-[#CED4DA] !ring-0 ${
+                    form.formState.errors[name]
+                      ? "border-red"
+                      : form.getFieldState(name).isDirty
+                      ? "border-green-500"
+                      : ""
+                  }`}
                 >
-                  {options.find((option) => option.id == field.value)?.name ||
-                    placeholder}
-                </SelectValue>
-              </SelectTrigger>
-            </FormControl>
+                  <SelectValue placeholder={placeholder}>
+                    {options.find((option) => option.id == field.value)?.name ||
+                      placeholder}
+                  </SelectValue>
+                </SelectTrigger>
+              </FormControl>
 
-            <SelectContent>
-              <SelectGroup>
-                {options.map((option) => (
-                  <SelectItem value={option.id} key={option.id}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </FormItem>
-      )}
+              <SelectContent>
+                <SelectGroup>
+                  {options.map((option) => (
+                    <SelectItem value={option.id} key={option.id}>
+                      {option.icon && (
+                        <Image
+                          src={option.icon}
+                          alt="option icon"
+                          width={20}
+                          height={20}
+                        />
+                      )}
+                      {option.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </FormItem>
+        );
+      }}
     />
   );
 };

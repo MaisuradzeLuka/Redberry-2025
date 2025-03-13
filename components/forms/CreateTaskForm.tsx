@@ -1,43 +1,35 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import FormInput from "../shared/FormInput";
 import { z } from "zod";
 import { taskSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "../ui/textarea";
-import { cn, generateValidationStyles } from "@/lib/utils";
+import { generateValidationStyles } from "@/lib/utils";
 import { MdOutlineDone } from "react-icons/md";
 import FormSelect from "../shared/FormSelect";
-import { CreateTaskType } from "@/lib/types";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@radix-ui/react-popover";
-import { CalendarIcon, Calendar } from "lucide-react";
-import { format } from "path";
+import { CreateTaskType, employeesType } from "@/lib/types";
 import Button from "../shared/Button";
-import { useState } from "react";
+
+import { DatePicker } from "../ui/DatePicker";
+import { useEffect, useRef, useState } from "react";
+import { fetchData, postData } from "@/lib/actions";
+import { format } from "date-fns";
+import { redirect } from "next/navigation";
 
 const CreateTaskForm = ({
   statuses,
   priorities,
   departments,
 }: CreateTaskType) => {
-  const [date, setDate] = useState();
+  const [employee, setEmployee] = useState<employeesType[]>([]);
+  const [initialEmployee, setInitialEmployee] = useState<employeesType[]>([]);
+  const isFirstRender = useRef(true);
 
   const form = useForm<z.infer<typeof taskSchema>>({
-    resolver: zodResolver(taskSchema),
+    // resolver: zodResolver(taskSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -49,95 +41,178 @@ const CreateTaskForm = ({
     },
   });
 
-  const onSubmit = (values: z.infer<typeof taskSchema>) => {};
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const employees: employeesType[] = await fetchData("employees");
+        setInitialEmployee(employees);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  useEffect(() => {
+    const departmentId = form.getValues("department_id");
+
+    if (departmentId) {
+      const filteredEmployees = initialEmployee.filter(
+        (employee) => employee.department.id === departmentId
+      );
+
+      setEmployee(filteredEmployees);
+
+      // ✅ Set first available employee automatically
+      if (filteredEmployees.length > 0) {
+        form.setValue("employee_id", filteredEmployees[0].id);
+      } else {
+        form.setValue("employee_id", undefined);
+      }
+    }
+  }, [form.watch("department_id"), initialEmployee]); // ✅ Only filters when department changes
+
+  const onSubmit = async (values: z.infer<typeof taskSchema>) => {
+    const { department_id, ...formData } = values;
+
+    const res = await postData("tasks", JSON.stringify(formData));
+
+    if (res === "SUCCESS") {
+      form.reset();
+      redirect("/");
+    }
+  };
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col xl:flex-row gap-40 items-start border border-[#DDD2FF] rounded-sm bg-[#FBF9FFA6] pl-[55px] pt-[65px] pb-[215px] text-sm text-[#0D0F10]"
+        className="relative border border-[#DDD2FF] rounded-sm bg-[#FBF9FFA6] pl-[55px] pt-[65px] pb-[215px] text-sm text-[#0D0F10]"
       >
-        <div className="flex flex-col gap-14 w-[550px]">
-          <FormInput label="სათაური*" form={form} name="name" />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm text-[#343A40] font-medium border-none">
-                  აღწერა
-                </FormLabel>
-
-                <FormControl>
-                  <div>
-                    <Textarea
-                      className={`w-full h-33 border-[#CED4DA] resize-none !ring-0 ${
-                        form.formState.errors.description && "border-red"
-                      }`}
-                      {...field}
-                    />
-                    <div>
-                      <p
-                        className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                          field.value!,
-                          2,
-                          255
-                        )}`}
-                      >
-                        <MdOutlineDone /> მინიმუმ 2 სიმბოლო
-                      </p>
-
-                      <p
-                        className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                          field.value!,
-                          2,
-                          255
-                        )}`}
-                      >
-                        <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო
-                      </p>
-                    </div>
-                  </div>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <div className="flex justify-between items-center gap-8">
-            <FormSelect
-              name="priority_id"
+        <div className="flex flex-col xl:flex-row gap-40 items-start h-[490px]">
+          <div className="flex flex-col justify-between gap-14 w-[550px] h-full">
+            <FormInput
+              label="სათაური*"
               form={form}
-              placeholder="პრიორიტეტი"
-              label="პრიორიტეტი*"
-              options={priorities}
+              name="name"
+              min={3}
+              max={255}
             />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-[#343A40] font-medium border-none">
+                    აღწერა
+                  </FormLabel>
+
+                  <FormControl>
+                    <div>
+                      <Textarea
+                        className={`w-full h-33 border-[#CED4DA] resize-none !ring-0 ${
+                          form.formState.errors.description && "border-red"
+                        }`}
+                        {...field}
+                      />
+                      <div>
+                        <p
+                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
+                            field.value!,
+                            3,
+                            255
+                          )}`}
+                        >
+                          <MdOutlineDone /> მინიმუმ 4 სიტყვა
+                        </p>
+
+                        <p
+                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
+                            field.value!,
+                            3,
+                            255
+                          )}`}
+                        >
+                          <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო
+                        </p>
+                      </div>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-between items-center gap-8 ">
+              <FormSelect
+                name="priority_id"
+                form={form}
+                placeholder="პრიორიტეტი"
+                label="პრიორიტეტი*"
+                options={priorities}
+                defaultValue={priorities[1].id}
+              />
+
+              <FormSelect
+                name="status_id"
+                form={form}
+                placeholder="დასაწყები"
+                label="სტატუსი*"
+                options={statuses}
+                defaultValue={statuses[0].id}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-between w-[550px] h-full gap-15">
             <FormSelect
-              name="status_id"
+              name="department_id"
               form={form}
-              placeholder="დასაწყები"
-              label="სტატუსი*"
-              options={statuses}
+              placeholder="აირჩიეთ დეპარტამენტი"
+              label="დეპარტამენტი*"
+              options={departments}
+            />
+
+            <FormSelect
+              name="employee_id"
+              form={form}
+              label="პასუხისმგებელი თანამშრომელი*"
+              options={employee}
+              className="-mt-22"
+              dissabled={form.getValues("department_id") ? false : true}
+            />
+
+            <FormField
+              control={form.control}
+              name="due_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-[#343A40] font-medium">
+                    დედლაინი*
+                  </FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      date={field.value ? new Date(field.value) : undefined}
+                      onChange={(selectedDate) =>
+                        field.onChange(
+                          selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""
+                        )
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
           </div>
         </div>
 
-        <div className="w-[550px] flex flex-col gap-15">
-          <FormSelect
-            name="department_id"
-            form={form}
-            placeholder="აირჩიეთ დეპარტამენტი"
-            label="დეპარტამენტი*"
-            options={departments}
-          />
-
-          <FormSelect
-            name="employee_id"
-            form={form}
-            label="პასუხისმგებელი თანამშრომელი*"
-            options={departments}
-          />
-        </div>
+        <Button
+          type="submit"
+          classname="absolute right-[350px] bottom-30 w-max border-primaryPurple bg-primaryPurple text-white cursor-pointer"
+        >
+          დავალების შექმნა
+        </Button>
       </form>
     </Form>
   );

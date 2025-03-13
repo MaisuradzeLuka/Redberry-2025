@@ -104,8 +104,20 @@ const AgentModal = () => {
           className="w-full flex flex-col items-center gap-12 mt-12 text-[#343A40]"
         >
           <div className="w-full flex justify-between gap-11">
-            <FormInput name="name" form={form} label="სახელი*" />
-            <FormInput name="surname" form={form} label="გვარი*" />
+            <FormInput
+              name="name"
+              form={form}
+              label="სახელი*"
+              min={2}
+              max={255}
+            />
+            <FormInput
+              name="surname"
+              form={form}
+              label="გვარი*"
+              min={2}
+              max={255}
+            />
           </div>
 
           <div className="w-full flex flex-col gap-2">

@@ -11,15 +11,35 @@ export type FormInputType = {
     | "priority_id";
   form: any;
   label: string;
+  min?: number;
+  max?: number;
+};
+
+type departmentsType = {
+  id: number;
+  name: string;
+};
+
+export type employeesType = {
+  id: number;
+  name: string;
+  surname: string;
+  avatar: string;
+  department: departmentsType;
+};
+
+type priorities = {
+  id: number;
+  name: string;
+  icon: string;
 };
 
 export type FormSelectType = FormInputType & {
   placeholder?: string;
-  options: {
-    name: string;
-    id: number;
-  }[];
+  options: priorities[] | departmentsType[] | employeesType[];
   defaultValue?: number;
+  className?: string;
+  dissabled?: boolean;
 };
 
 export type CreateTaskType = {

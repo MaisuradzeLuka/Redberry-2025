@@ -10,7 +10,7 @@ export const agentSchema = z.object({
 });
 
 export const taskSchema = z.object({
-  name: z.string().min(2).max(255),
+  name: z.string().min(3).max(255),
   description: z
     .string()
     .min(4)
