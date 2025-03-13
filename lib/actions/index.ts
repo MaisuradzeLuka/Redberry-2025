@@ -39,8 +39,6 @@ export const postData = async (additionalUrl: string, body: any) => {
 
     if (res.status !== 201) throw new Error("Respose wasnt successful");
 
-    console.log(res);
-
     const data = await res.json();
 
     if (data) {

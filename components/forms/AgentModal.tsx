@@ -7,34 +7,19 @@ import {
   DialogClose,
 } from "../ui/dialog";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "../ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "../ui/input";
+import { Form } from "../ui/form";
 import Button from "../shared/Button";
 import { agentSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { generateValidationStyles, handleFileChange } from "@/lib/utils";
+import { handleFileChange } from "@/lib/utils";
 import Image from "next/image";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LuImagePlus } from "react-icons/lu";
-import { MdOutlineDone } from "react-icons/md";
 import { fetchData, postData } from "@/lib/actions";
+import FormInput from "../shared/FormInput";
+import FormSelect from "../shared/FormSelect";
 
 type DepartmentsType = {
   id: number;
@@ -119,91 +104,8 @@ const AgentModal = () => {
           className="w-full flex flex-col items-center gap-12 mt-12 text-[#343A40]"
         >
           <div className="w-full flex justify-between gap-11">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="w-full flex flex-col gap-2 ">
-                  <FormLabel className="text-sm text-[#343A40] font-medium border-none">
-                    სახელი*
-                  </FormLabel>
-
-                  <FormControl>
-                    <Input
-                      type="text"
-                      className={`h-10 border-[#CED4DA] !ring-0 ${
-                        form.formState.errors.name && "border-red"
-                      }`}
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <div>
-                    <p
-                      className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                        field.value,
-                        2,
-                        255
-                      )}`}
-                    >
-                      <MdOutlineDone /> მინიმუმ 2 სიმბოლო
-                    </p>
-                    <p
-                      className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                        field.value,
-                        2,
-                        255
-                      )}`}
-                    >
-                      <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო
-                    </p>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="surname"
-              render={({ field }) => (
-                <FormItem className="w-full flex flex-col gap-2 ">
-                  <FormLabel className="text-sm text-[#343A40] font-medium border-none">
-                    გვარი*
-                  </FormLabel>
-
-                  <FormControl>
-                    <Input
-                      type="text"
-                      className={`h-10 border-[#CED4DA] !ring-0 ${
-                        form.formState.errors.name && "border-red"
-                      }`}
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <div>
-                    <p
-                      className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                        field.value,
-                        2,
-                        255
-                      )}`}
-                    >
-                      <MdOutlineDone /> მინიმუმ 2 სიმბოლო
-                    </p>
-                    <p
-                      className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                        field.value,
-                        2,
-                        255
-                      )}`}
-                    >
-                      <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო
-                    </p>
-                  </div>
-                </FormItem>
-              )}
-            />
+            <FormInput name="name" form={form} label="სახელი*" />
+            <FormInput name="surname" form={form} label="გვარი*" />
           </div>
 
           <div className="w-full flex flex-col gap-2">
@@ -254,48 +156,15 @@ const AgentModal = () => {
             </label>
           </div>
 
-          <FormField
-            control={form.control}
-            name="department_id"
-            render={({ field }) => (
-              <FormItem className="self-start w-[384px] flex flex-col gap-2 ">
-                <FormLabel className="text-sm text-[#343A40] font-medium border-none">
-                  დეპარტამენტი*
-                </FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(Number(value))}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger
-                      className={`w-full h-10 border-[#CED4DA] ${
-                        form.formState.errors.department_id
-                          ? "border-red"
-                          : form.getFieldState("department_id").isDirty
-                          ? "border-green-500"
-                          : ""
-                      }`}
-                    >
-                      <SelectValue placeholder="აირჩიეთ დეპარტამენტი">
-                        {departments.find((dept) => dept.id == field.value)
-                          ?.name || "აირჩიეთ დეპარტამენტი"}
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      {departments.map((department) => (
-                        <SelectItem value={department.id} key={department.id}>
-                          {department.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
+          <div className="w-[384px] self-start">
+            <FormSelect
+              name="department_id"
+              label="დეპარტამენტი*"
+              form={form}
+              placeholder={"აირჩიეთ დეპარტამენტი"}
+              options={departments}
+            />
+          </div>
 
           <div className="self-end mt-2">
             <DialogClose className="text-[16px] px-5 py-3 border rounded-md border-primaryPurple mr-5">
