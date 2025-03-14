@@ -17,7 +17,7 @@ export const taskSchema = z.object({
     .max(255)
     .refine((desc) => desc.split(/\s+/).filter(Boolean).length >= 4)
     .optional(),
-  due_date: z.date(),
+  due_date: z.string().nonempty(),
   status_id: z.number(),
   employee_id: z.number(),
   priority_id: z.number(),

@@ -27,13 +27,14 @@ const CreateTaskForm = ({
   const [employee, setEmployee] = useState<employeesType[]>([]);
   const [initialEmployee, setInitialEmployee] = useState<employeesType[]>([]);
   const isFirstRender = useRef(true);
+  const [test, setTest] = useState(false);
 
   const form = useForm<z.infer<typeof taskSchema>>({
-    // resolver: zodResolver(taskSchema),
+    resolver: zodResolver(taskSchema),
     defaultValues: {
       name: "",
       description: "",
-      due_date: undefined,
+      due_date: "",
       status_id: undefined,
       employee_id: undefined,
       priority_id: undefined,
@@ -42,6 +43,11 @@ const CreateTaskForm = ({
   });
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const fetchEmployees = async () => {
       try {
         const employees: employeesType[] = await fetchData("employees");
@@ -52,7 +58,7 @@ const CreateTaskForm = ({
     };
 
     fetchEmployees();
-  }, []);
+  }, [form.watch("department_id")]);
 
   useEffect(() => {
     const departmentId = form.getValues("department_id");
@@ -62,27 +68,24 @@ const CreateTaskForm = ({
         (employee) => employee.department.id === departmentId
       );
 
-      setEmployee(filteredEmployees);
-
-      // ✅ Set first available employee automatically
-      if (filteredEmployees.length > 0) {
-        form.setValue("employee_id", filteredEmployees[0].id);
-      } else {
-        form.setValue("employee_id", undefined);
+      if (form.getValues("employee_id")) {
+        form.resetField("employee_id");
       }
+
+      setEmployee(filteredEmployees);
     }
-  }, [form.watch("department_id"), initialEmployee]); // ✅ Only filters when department changes
+  }, [form.watch("department_id"), initialEmployee]);
 
   const onSubmit = async (values: z.infer<typeof taskSchema>) => {
     const { department_id, ...formData } = values;
-
     const res = await postData("tasks", JSON.stringify(formData));
-
     if (res === "SUCCESS") {
       form.reset();
       redirect("/");
     }
   };
+
+  console.log(form.getFieldState("due_date"));
 
   return (
     <Form {...form}>
@@ -112,7 +115,7 @@ const CreateTaskForm = ({
                   <FormControl>
                     <div>
                       <Textarea
-                        className={`w-full h-33 border-[#CED4DA] resize-none !ring-0 ${
+                        className={`w-full h-33 border-[#CED4DA] resize-none !ring-0 mb-2 ${
                           form.formState.errors.description && "border-red"
                         }`}
                         {...field}
@@ -175,12 +178,13 @@ const CreateTaskForm = ({
             />
 
             <FormSelect
+              key={form.watch("department_id")}
               name="employee_id"
               form={form}
-              label="პასუხისმგებელი თანამშრომელი*"
+              label="პასუხმძღვანელი თანამშრომელი*"
               options={employee}
               className="-mt-22"
-              dissabled={form.getValues("department_id") ? false : true}
+              dissabled={!form.getValues("department_id")}
             />
 
             <FormField
@@ -193,6 +197,8 @@ const CreateTaskForm = ({
                   </FormLabel>
                   <FormControl>
                     <DatePicker
+                      isDirty={form.getFieldState("due_date").isDirty}
+                      error={!form.getFieldState("due_date").error}
                       date={field.value ? new Date(field.value) : undefined}
                       onChange={(selectedDate) =>
                         field.onChange(

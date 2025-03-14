@@ -13,25 +13,28 @@ import {
 export function DatePicker({
   date,
   onChange,
+  error,
+  isDirty,
 }: {
   date?: Date;
   onChange: (date?: Date) => void;
+  error: boolean;
+  isDirty: boolean;
 }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
-          className={cn(
-            "w-[320px]  border-[#CED4DA] !ring-0 justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
+          className={`w-[320px]  border-[#CED4DA] !ring-0 justify-start text-left font-normal !date && "text-muted-foreground ${
+            !error ? "border-red" : isDirty ? "border-green-500" : ""
+          }`}
         >
           <CalendarIcon className="mr-2" />
           {date ? format(date, "dd/MM/yyyy") : <span>DD/MM/YYYY</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 bg-white" align="start">
         <Calendar
           mode="single"
           selected={date}
@@ -42,3 +45,8 @@ export function DatePicker({
     </Popover>
   );
 }
+
+// cn(
+//   "w-[320px]  border-[#CED4DA] !ring-0 justify-start text-left font-normal",
+//   !date && "text-muted-foreground"
+// )
