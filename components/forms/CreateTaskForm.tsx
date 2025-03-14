@@ -85,8 +85,6 @@ const CreateTaskForm = ({
     }
   };
 
-  console.log(form.getFieldState("due_date"));
-
   return (
     <Form {...form}>
       <form

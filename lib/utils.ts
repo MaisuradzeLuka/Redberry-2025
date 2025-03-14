@@ -39,3 +39,50 @@ export const generateValidationStyles = (
   if (value.length < min || value.length > 255) return "text-red";
   return "text-green-500";
 };
+
+export const formatDate = (isoString: string) => {
+  const date = new Date(isoString);
+
+  return date.toLocaleString("ka-GE", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+export const trimDepartments = (department: string) => {
+  switch (department) {
+    case "მედიის დეპარტამენტი":
+      return "მედია";
+
+    case "ტექნოლოგიების დეპარტამენტი":
+      return "ინფ. ტექ.";
+
+    case "ლოჯოსტიკის დეპარტამენტი":
+      return "ლოჯისტიკა";
+
+    case "გაყიდვები და მარკეტინგის დეპარტამენტი":
+      return "მარკეტინგი";
+
+    case "ფინანსების დეპარტამენტი":
+      return "ფინანსები";
+
+    case "ადამიანური რესურსების დეპარტამენტი":
+      return "ადმნ. რეს.";
+
+    case "ადმინისტრაციის დეპარტამენტი":
+      return "ადმინისტრაცია";
+
+    default:
+      return department;
+  }
+};
+
+export const trimDescription = (description: string) => {
+  if (description.trim().length > 100) {
+    const newDescription = description.slice(0, 99) + "...";
+    return newDescription;
+  } else {
+    return description;
+  }
+};

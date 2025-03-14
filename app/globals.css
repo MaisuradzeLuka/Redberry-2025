@@ -6,10 +6,10 @@
 @theme {
   --color-primaryPurple: oklch(0.67 0.66 273.47);
   --color-hoverPurple: oklch(0.74 0.28 258.97);
-  --color-orange: oklch(0.79 0.91 29.98);
+  --color-orange: oklch(0.7 0.25 40);
   --color-pink: oklch(0.66 0.89 327.89);
   --color-blue: oklch(0.65 0.61 210.98);
   --color-red: oklch(0.66 0.73 10.34);
   --color-green: oklch(0.38 0.84 120.52);
-  --color-yellow: oklch(0.86 0.87 50.04);
+  --color-yellow: oklch(0.8 0.16 80);
 }

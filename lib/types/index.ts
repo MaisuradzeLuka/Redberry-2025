@@ -47,3 +47,21 @@ export type CreateTaskType = {
   statuses: { id: number; name: string }[];
   departments: { id: number; name: string }[];
 };
+
+export type TaskType = {
+  id: number;
+  name: string;
+  description: string | null;
+  due_date: string;
+  department: { id: number; name: string };
+  employee: {
+    id: number;
+    name: string;
+    surname: string;
+    avatar: string;
+    department: departmentsType;
+  };
+  status: departmentsType;
+  priority: priorities;
+  total_comments: number;
+};
