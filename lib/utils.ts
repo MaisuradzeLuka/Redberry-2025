@@ -40,8 +40,20 @@ export const generateValidationStyles = (
   return "text-green-500";
 };
 
-export const formatDate = (isoString: string) => {
+export const formatDate = (isoString: string, shortFormat: boolean = false) => {
   const date = new Date(isoString);
+
+  if (shortFormat) {
+    return date
+      .toLocaleString("ka-GE", {
+        weekday: "short",
+        day: "2-digit",
+        month: "numeric",
+        year: "numeric",
+      })
+      .replace(",", " -")
+      .replace(/\./g, "/");
+  }
 
   return date.toLocaleString("ka-GE", {
     day: "2-digit",

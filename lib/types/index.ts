@@ -15,7 +15,7 @@ export type FormInputType = {
   max?: number;
 };
 
-type departmentsType = {
+export type departmentsType = {
   id: number;
   name: string;
 };
@@ -28,7 +28,7 @@ export type employeesType = {
   department: departmentsType;
 };
 
-type priorities = {
+export type priorities = {
   id: number;
   name: string;
   icon: string;
@@ -65,3 +65,29 @@ export type TaskType = {
   priority: priorities;
   total_comments: number;
 };
+
+export type ChangeStatusType = {
+  defaultValue: departmentsType;
+  options: priorities[];
+  taskId: string;
+};
+
+export type CommentsType = {
+  taskId?: string;
+  id: number;
+  text: string;
+  task_id: number;
+  parent_id: null | number;
+  author_avatar: string;
+  author_nickname: string;
+  sub_comments?: {
+    id: number;
+    text: string;
+    task_id: number;
+    parent_id: number;
+    author_avatar: string;
+    author_nickname: string;
+  }[];
+};
+
+export type CommentCardType = {};
