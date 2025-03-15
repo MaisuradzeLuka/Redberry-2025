@@ -16,7 +16,7 @@ import Button from "../shared/Button";
 import { DatePicker } from "../ui/DatePicker";
 import { useEffect, useRef, useState } from "react";
 import { fetchData, postData } from "@/lib/actions";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { redirect } from "next/navigation";
 
 const CreateTaskForm = ({
@@ -27,14 +27,13 @@ const CreateTaskForm = ({
   const [employee, setEmployee] = useState<employeesType[]>([]);
   const [initialEmployee, setInitialEmployee] = useState<employeesType[]>([]);
   const isFirstRender = useRef(true);
-  const [test, setTest] = useState(false);
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       name: "",
       description: "",
-      due_date: "",
+      due_date: format(addDays(new Date(), 1), "yyyy-MM-dd"),
       status_id: undefined,
       employee_id: undefined,
       priority_id: undefined,
@@ -79,10 +78,23 @@ const CreateTaskForm = ({
   const onSubmit = async (values: z.infer<typeof taskSchema>) => {
     const { department_id, ...formData } = values;
     const res = await postData("tasks", JSON.stringify(formData));
+
     if (res === "SUCCESS") {
       form.reset();
       redirect("/");
     }
+  };
+
+  const generateDescValidation = (desc: string) => {
+    const trimmedDesc = desc.trim();
+
+    if (trimmedDesc === "") return "text-[#6C757D]";
+
+    const wordCount = trimmedDesc.split(/\s+/).length;
+
+    if (wordCount < 4 || trimmedDesc.length > 255) return "text-red";
+
+    return "text-green-500";
   };
 
   return (
@@ -120,10 +132,8 @@ const CreateTaskForm = ({
                       />
                       <div>
                         <p
-                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                            field.value!,
-                            3,
-                            255
+                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateDescValidation(
+                            field.value!
                           )}`}
                         >
                           <MdOutlineDone /> მინიმუმ 4 სიტყვა
@@ -198,11 +208,12 @@ const CreateTaskForm = ({
                       isDirty={form.getFieldState("due_date").isDirty}
                       error={!form.getFieldState("due_date").error}
                       date={field.value ? new Date(field.value) : undefined}
-                      onChange={(selectedDate) =>
+                      onChange={(selectedDate) => {
                         field.onChange(
                           selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""
-                        )
-                      }
+                        );
+                        form.trigger("due_date");
+                      }}
                     />
                   </FormControl>
                 </FormItem>

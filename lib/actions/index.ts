@@ -25,19 +25,28 @@ export const fetchData = async (additionalUrl: string) => {
   }
 };
 
-export const postData = async (additionalUrl: string, body: any) => {
+export const postData = async (
+  additionalUrl: string,
+  body: any,
+  isMultipart = false
+) => {
   const apiUrl = process.env.NEXT_MOMENTUM_API!;
   const TOKEN = process.env.NEXT_BEARER_TOKEN!;
 
   try {
+    const headers: HeadersInit = {
+      Accept: "application/json",
+      Authorization: `Bearer ${TOKEN}`,
+    };
+
+    if (!isMultipart) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(`${apiUrl}/${additionalUrl}`, {
       method: "POST",
       body: body,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`,
-      },
+      headers,
     });
 
     if (res.status !== 201) throw new Error("Respose wasnt successful");

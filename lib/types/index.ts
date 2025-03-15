@@ -40,6 +40,7 @@ export type FormSelectType = FormInputType & {
   defaultValue?: number;
   className?: string;
   dissabled?: boolean;
+  addEmployee?: boolean;
 };
 
 export type CreateTaskType = {

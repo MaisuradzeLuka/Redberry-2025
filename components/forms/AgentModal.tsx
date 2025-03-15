@@ -83,7 +83,7 @@ const AgentModal = () => {
       formData.append("avatar", blob, "avatar.jpg");
     }
 
-    const res = await postData("employees", formData);
+    const res = await postData("employees", formData, true);
     if (res === "SUCCESS") {
       form.reset();
       setImage("");
@@ -91,7 +91,13 @@ const AgentModal = () => {
   };
 
   return (
-    <DialogContent className=" bg-white w-full lg:w-[915px] !max-w-none mx-2 pt-[115px] pb-[60px] px-13">
+    <DialogContent
+      className=" bg-white w-full lg:w-[915px] !max-w-none mx-2 pt-[115px] pb-[60px] px-13"
+      onOpenAutoFocus={() => {
+        form.reset();
+        setImage("");
+      }}
+    >
       <DialogHeader>
         <DialogTitle className="text-4xl font-medium text-center">
           თანამშრომლის დამატება
@@ -129,6 +135,7 @@ const AgentModal = () => {
             </label>
 
             <label
+              htmlFor="avatar"
               className={`w-full flex justify-center items-center h-[120px] border border-dashed border-[#CED4DA] rounded-lg cursor-pointer ${
                 form.formState.errors.avatar ? "border-red" : ""
               }`}
@@ -157,15 +164,15 @@ const AgentModal = () => {
                   ატვირთე ფოტო
                 </div>
               )}
-
-              <input
-                type="file"
-                id="image"
-                className="border hidden"
-                {...form.register("avatar")}
-                onChange={(e) => onChange(e)}
-              />
             </label>
+
+            <input
+              type="file"
+              id="avatar"
+              className="border hidden"
+              {...form.register("avatar")}
+              onChange={(e) => onChange(e)}
+            />
           </div>
 
           <div className="w-[384px] self-start">
