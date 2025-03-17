@@ -16,6 +16,8 @@ export type FormInputType = {
 };
 
 export type departmentsType = {
+  avatar: any;
+  icon: any;
   id: number;
   name: string;
 };
@@ -41,6 +43,7 @@ export type FormSelectType = FormInputType & {
   className?: string;
   dissabled?: boolean;
   addEmployee?: boolean;
+  isAgent?: boolean;
 };
 
 export type CreateTaskType = {
@@ -91,4 +94,8 @@ export type CommentsType = {
   }[];
 };
 
-export type CommentCardType = {};
+export type FilterTasksType = {
+  selectedDepartments: string[];
+  selectedEmployees: string[];
+  selectedPriorities: string[];
+};

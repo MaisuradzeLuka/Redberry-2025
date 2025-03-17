@@ -20,9 +20,11 @@ const Navbar = () => {
           <AgentModal />
         </Dialog>
 
-        <Button classname="border-primaryPurple bg-primaryPurple  text-white">
-          <Link href="/addTask">+ შექმენით ახალი დავალება</Link>
-        </Button>
+        <Link href="/addTask">
+          <Button classname="border-primaryPurple bg-primaryPurple  text-white">
+            + შექმენით ახალი დავალება
+          </Button>
+        </Link>
       </div>
     </nav>
   );

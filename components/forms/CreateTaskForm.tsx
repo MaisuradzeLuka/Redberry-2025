@@ -17,7 +17,7 @@ import { DatePicker } from "../ui/DatePicker";
 import { useEffect, useRef, useState } from "react";
 import { fetchData, postData } from "@/lib/actions";
 import { addDays, format } from "date-fns";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 
 const CreateTaskForm = ({
   statuses,
@@ -28,16 +28,23 @@ const CreateTaskForm = ({
   const [initialEmployee, setInitialEmployee] = useState<employeesType[]>([]);
   const isFirstRender = useRef(true);
 
+  const pathName = usePathname();
+
+  const defaultValues = JSON.parse(
+    (typeof window !== "undefined" && localStorage.getItem("formData")) || "{}"
+  );
+
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      due_date: format(addDays(new Date(), 1), "yyyy-MM-dd"),
-      status_id: undefined,
-      employee_id: undefined,
-      priority_id: undefined,
-      department_id: undefined,
+      name: defaultValues.name || "",
+      description: defaultValues.description || "",
+      due_date:
+        defaultValues.due_date || format(addDays(new Date(), 1), "yyyy-MM-dd"),
+      status_id: defaultValues.status_id || undefined,
+      employee_id: defaultValues.employee_id || undefined,
+      priority_id: defaultValues.priority_id || undefined,
+      department_id: defaultValues.department_id || undefined,
     },
   });
 
@@ -75,11 +82,24 @@ const CreateTaskForm = ({
     }
   }, [form.watch("department_id"), initialEmployee]);
 
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      sessionStorage.setItem("formData", JSON.stringify(value));
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
+  useEffect(() => {
+    sessionStorage.clear();
+  }, [pathName]);
+
   const onSubmit = async (values: z.infer<typeof taskSchema>) => {
     const { department_id, ...formData } = values;
     const res = await postData("tasks", JSON.stringify(formData));
 
     if (res === "SUCCESS") {
+      sessionStorage.clear();
       form.reset();
       redirect("/");
     }
@@ -193,6 +213,7 @@ const CreateTaskForm = ({
               options={employee}
               className="-mt-22"
               dissabled={!form.getValues("department_id")}
+              isAgent={true}
             />
 
             <FormField

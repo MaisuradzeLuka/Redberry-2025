@@ -172,6 +172,7 @@ const AgentModal = () => {
               className="border hidden"
               {...form.register("avatar")}
               onChange={(e) => onChange(e)}
+              // onClick={(e) => e.()}
             />
           </div>
 
@@ -180,7 +181,6 @@ const AgentModal = () => {
               name="department_id"
               label="დეპარტამენტი*"
               form={form}
-              placeholder={"აირჩიეთ დეპარტამენტი"}
               options={departments}
             />
           </div>
