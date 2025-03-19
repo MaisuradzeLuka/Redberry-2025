@@ -50,7 +50,7 @@ const FormSelect = ({
             >
               <FormControl>
                 <SelectTrigger
-                  className={`w-full h-10 border-[#CED4DA] !ring-0 ${
+                  className={`w-full h-10 border-[#CED4DA] !ring-0 data-[state=open]:[&>*:last-child]:rotate-180 ${
                     form.formState.errors[name]
                       ? "border-red"
                       : form.getFieldState(name).isDirty
@@ -59,26 +59,35 @@ const FormSelect = ({
                   }`}
                 >
                   <SelectValue placeholder={placeholder}>
-                    {selectedOption?.avatar || selectedOption?.icon ? (
-                      <Image
-                        src={selectedOption.avatar || selectedOption.icon}
-                        alt="select icon"
-                        width={24}
-                        height={24}
-                        className="rounded-full w-6 h-6"
-                      />
-                    ) : (
-                      ""
-                    )}
+                    {selectedOption &&
+                      ("avatar" in selectedOption ? (
+                        <Image
+                          src={selectedOption.avatar}
+                          alt="select avatar"
+                          width={24}
+                          height={24}
+                          className="rounded-full w-6 h-6"
+                        />
+                      ) : "icon" in selectedOption ? (
+                        <Image
+                          src={selectedOption.icon}
+                          alt="select icon"
+                          width={24}
+                          height={24}
+                          className="rounded-full w-6 h-6"
+                        />
+                      ) : (
+                        ""
+                      ))}
                     {selectedOption?.name || placeholder}
                   </SelectValue>
                 </SelectTrigger>
               </FormControl>
 
-              <SelectContent>
+              <SelectContent className="p-3">
                 {isAgent ? (
                   <>
-                    <DialogTrigger className="flex items-center gap-2 text-[16px] text-primaryPurple ml-2  border rounded-md border-none cursor-pointer">
+                    <DialogTrigger className="flex items-center gap-2 text-[16px] font-normal text-primaryPurple ml-2  border rounded-md border-none cursor-pointer mb-4 ">
                       <GoPlusCircle className="text-lg" />
                       დაამატე თანამშრომელი
                     </DialogTrigger>
@@ -87,7 +96,7 @@ const FormSelect = ({
                   ""
                 )}
 
-                <SelectGroup className="flex flex-col gap-3 items-start p-3">
+                <SelectGroup className="flex flex-col gap-3 items-start">
                   {options.map((option) => (
                     <SelectItem value={String(option.id)} key={option.id}>
                       {"icon" in option && (
@@ -101,11 +110,11 @@ const FormSelect = ({
 
                       {"avatar" in option && (
                         <Image
-                          className="rounded-full w-5 h-5"
+                          className="rounded-full w-7 h-7"
                           src={option.avatar}
                           alt="option user avatar"
-                          width={20}
-                          height={20}
+                          width={28}
+                          height={28}
                         />
                       )}
 

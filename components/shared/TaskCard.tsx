@@ -51,7 +51,7 @@ const TaskCard = ({
           {priority.name}
         </span>
 
-        <span className={`px-2 py-1 bg-pink rounded-2xl ml-2 text-white`}>
+        <span className={`px-2 py-1 bg-blue rounded-2xl ml-2 text-white`}>
           {trimDepartments(department.name)}
         </span>
 

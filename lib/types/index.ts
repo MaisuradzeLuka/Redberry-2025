@@ -15,30 +15,35 @@ export type FormInputType = {
   max?: number;
 };
 
-export type departmentsType = {
+export type DepartmentsType = {
   avatar: any;
   icon: any;
   id: number;
   name: string;
 };
 
-export type employeesType = {
+export type EmployeesType = {
   id: number;
   name: string;
   surname: string;
   avatar: string;
-  department: departmentsType;
+  department: DepartmentsType;
 };
 
-export type priorities = {
+export type PrioritiesType = {
   id: number;
   name: string;
   icon: string;
 };
 
+export type StatusType = {
+  id: number;
+  name: string;
+};
+
 export type FormSelectType = FormInputType & {
   placeholder?: string;
-  options: priorities[] | departmentsType[] | employeesType[];
+  options: Array<PrioritiesType | DepartmentsType | EmployeesType | StatusType>;
   defaultValue?: number;
   className?: string;
   dissabled?: boolean;
@@ -49,7 +54,7 @@ export type FormSelectType = FormInputType & {
 export type CreateTaskType = {
   priorities: { id: number; name: string; icon: string }[];
   statuses: { id: number; name: string }[];
-  departments: { id: number; name: string }[];
+  departments: DepartmentsType[];
 };
 
 export type TaskType = {
@@ -63,16 +68,16 @@ export type TaskType = {
     name: string;
     surname: string;
     avatar: string;
-    department: departmentsType;
+    department: DepartmentsType;
   };
-  status: departmentsType;
-  priority: priorities;
+  status: DepartmentsType;
+  priority: PrioritiesType;
   total_comments: number;
 };
 
 export type ChangeStatusType = {
-  defaultValue: departmentsType;
-  options: priorities[];
+  defaultValue: DepartmentsType;
+  options: PrioritiesType[];
   taskId: string;
 };
 

@@ -30,7 +30,7 @@ const ChangeStatus = ({ defaultValue, options, taskId }: ChangeStatusType) => {
       value={defaultValue.id}
     >
       <SelectTrigger
-        className={`h-10 border border-[#CED4DA] !ring-0 text-sm text-[#0D0F10]`}
+        className={`h-10 border border-[#CED4DA] !ring-0 text-sm text-[#0D0F10] w-[260px]`}
       >
         <SelectValue>
           {options.find((option) => option.id === selectValue)?.name ||

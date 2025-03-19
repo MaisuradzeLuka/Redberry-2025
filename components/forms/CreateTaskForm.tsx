@@ -10,7 +10,7 @@ import { Textarea } from "../ui/textarea";
 import { generateValidationStyles } from "@/lib/utils";
 import { MdOutlineDone } from "react-icons/md";
 import FormSelect from "../shared/FormSelect";
-import { CreateTaskType, employeesType } from "@/lib/types";
+import { CreateTaskType, EmployeesType } from "@/lib/types";
 import Button from "../shared/Button";
 
 import { DatePicker } from "../ui/DatePicker";
@@ -24,8 +24,8 @@ const CreateTaskForm = ({
   priorities,
   departments,
 }: CreateTaskType) => {
-  const [employee, setEmployee] = useState<employeesType[]>([]);
-  const [initialEmployee, setInitialEmployee] = useState<employeesType[]>([]);
+  const [employee, setEmployee] = useState<EmployeesType[]>([]);
+  const [initialEmployee, setInitialEmployee] = useState<EmployeesType[]>([]);
   const isFirstRender = useRef(true);
 
   const pathName = usePathname();
@@ -56,7 +56,7 @@ const CreateTaskForm = ({
 
     const fetchEmployees = async () => {
       try {
-        const employees: employeesType[] = await fetchData("employees");
+        const employees: EmployeesType[] = await fetchData("employees");
         setInitialEmployee(employees);
       } catch (error) {
         console.error("Error fetching employees:", error);

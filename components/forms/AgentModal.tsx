@@ -20,11 +20,7 @@ import { LuImagePlus } from "react-icons/lu";
 import { fetchData, postData } from "@/lib/actions";
 import FormInput from "../shared/FormInput";
 import FormSelect from "../shared/FormSelect";
-
-type DepartmentsType = {
-  id: number;
-  name: string;
-};
+import { DepartmentsType } from "@/lib/types";
 
 const AgentModal = () => {
   const [image, setImage] = useState("");
@@ -56,6 +52,14 @@ const AgentModal = () => {
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
+    if (file)
+      if (file.size > 600 * 1024) {
+        form.setError("avatar", {
+          message: "ფოტოს ზომა აღემატება 600 კილობაიტს",
+        });
+      }
+
     const image = await handleFileChange(file);
 
     if (image) {
@@ -172,7 +176,6 @@ const AgentModal = () => {
               className="border hidden"
               {...form.register("avatar")}
               onChange={(e) => onChange(e)}
-              // onClick={(e) => e.()}
             />
           </div>
 

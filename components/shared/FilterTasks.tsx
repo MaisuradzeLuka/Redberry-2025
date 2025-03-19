@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/menubar";
 import { fetchData } from "@/lib/actions";
 import {
-  departmentsType,
-  employeesType,
+  DepartmentsType,
+  EmployeesType,
   FilterTasksType,
-  priorities,
+  PrioritiesType,
 } from "@/lib/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import Button from "./Button";
 import { trimDepartments } from "@/lib/utils";
@@ -26,22 +26,29 @@ const FilterTasks = ({
   selectedEmployees,
   selectedPriorities,
 }: FilterTasksType) => {
+  const isFirstRender = useRef(true);
   const [filteredTaskTags, setFilteredTaskTags] = useState<
     { id: number; name: string }[]
   >([]);
+  console.log(filteredTaskTags);
+
+  const [searchUrl, setSearchUrl] = useState("");
 
   const [options, setOptions] = useState<{
-    departments?: departmentsType[];
-    priorities?: priorities[];
-    employees?: employeesType[];
+    departments?: DepartmentsType[];
+    priorities?: PrioritiesType[];
+    employees?: EmployeesType[];
   }>({});
 
-  const [filters, setFilters] = useState({
-    departments: new Set<string>(),
-    priorities: new Set<string>(),
-    employees: new Set<string>(),
+  const [selectedFilters, setSelectedFilters] = useState<{
+    departments: string[];
+    priorities: string[];
+    employees: string[];
+  }>({
+    departments: selectedDepartments || [],
+    priorities: selectedPriorities || [],
+    employees: selectedEmployees || [],
   });
-
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -76,38 +83,73 @@ const FilterTasks = ({
     ]);
   }, [options, selectedPriorities, selectedEmployees, selectedDepartments]);
 
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    router.push(`${window.location.pathname}?${searchUrl}`, {
+      scroll: false,
+    });
+  }, [searchUrl]);
+
   const handleCheckboxChange = (
-    type: keyof typeof filters,
-    id: string,
+    name: keyof typeof selectedFilters,
+    id: number,
     checked: boolean
   ) => {
-    setFilters((prev) => {
-      const updated = new Set(prev[type]);
-      checked ? updated.add(id) : updated.delete(id);
-      return { ...prev, [type]: updated };
+    setSelectedFilters((prev) => {
+      const updatedArray = checked
+        ? [...prev[name], String(id)]
+        : prev[name].filter((param) => param !== String(id));
+
+      return {
+        ...prev,
+        [name]: updatedArray,
+      };
     });
   };
 
   const applyFilters = () => {
     const params = new URLSearchParams(searchParams);
-    Object.entries(filters).forEach(([key, value]) => {
-      value.size
+
+    Object.entries(selectedFilters).forEach(([key, value]) => {
+      value.length
         ? params.set(key, Array.from(value).join(","))
         : params.delete(key);
     });
 
-    router.push(`${window.location.pathname}?${params.toString()}`, {
-      scroll: false,
-    });
+    setSearchUrl(params.toString());
   };
 
   const onClick = (clearPath: boolean, id?: number) => {
     if (clearPath) {
       setFilteredTaskTags([]);
       router.push(window.location.pathname, { scroll: false });
-    } else {
-      console.log(searchParams.entries);
     }
+  };
+
+  const removeParamValue = (
+    paramName: string,
+    valueToRemove: string | number
+  ) => {
+    const params = new URLSearchParams(window.location.search);
+
+    const values = params.getAll(paramName);
+
+    const updatedValues = values.filter((value) => value !== valueToRemove);
+
+    if (updatedValues.length > 0) {
+      params.delete(paramName);
+      updatedValues.forEach((value) => params.append(paramName, value));
+    } else {
+      params.delete(paramName);
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+
+    window.history.replaceState({}, "", newUrl);
   };
 
   return (
@@ -131,11 +173,13 @@ const FilterTasks = ({
               <div key={item.id} className="flex items-center gap-3">
                 <Checkbox
                   id={String(item.id)}
-                  checked={filters.departments.has(String(item.id))}
+                  checked={selectedFilters.departments.includes(
+                    String(item.id)
+                  )}
                   onCheckedChange={(checked) =>
                     handleCheckboxChange(
                       "departments",
-                      String(item.id),
+                      item.id,
                       checked as boolean
                     )
                   }
@@ -171,11 +215,11 @@ const FilterTasks = ({
               <div key={item.id} className="flex items-center gap-3">
                 <Checkbox
                   id={String(item.id)}
-                  checked={filters.priorities.has(String(item.id))}
+                  checked={selectedFilters.priorities.includes(String(item.id))}
                   onCheckedChange={(checked) =>
                     handleCheckboxChange(
                       "priorities",
-                      String(item.id),
+                      item.id,
                       checked as boolean
                     )
                   }
@@ -211,11 +255,11 @@ const FilterTasks = ({
               <div key={item.id} className="flex items-center gap-3">
                 <Checkbox
                   id={String(item.id)}
-                  checked={filters.employees.has(String(item.id))}
+                  checked={selectedFilters.employees.includes(String(item.id))}
                   onCheckedChange={(checked) =>
                     handleCheckboxChange(
                       "employees",
-                      String(item.id),
+                      item.id,
                       checked as boolean
                     )
                   }
@@ -248,7 +292,7 @@ const FilterTasks = ({
               {trimDepartments(tag.name)}
               <button
                 className="cursor-pointer"
-                onClick={() => onClick(false, tag.id)}
+                onClick={() => removeParamValue(tag.name, tag.id)}
               >
                 <RxCross1 />
               </button>
