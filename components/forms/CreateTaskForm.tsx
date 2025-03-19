@@ -108,6 +108,9 @@ const CreateTaskForm = ({
   const generateDescValidation = (desc: string) => {
     const trimmedDesc = desc.trim();
 
+    if (trimmedDesc === "" && form.getFieldState("description").isDirty)
+      return "text-red";
+
     if (trimmedDesc === "") return "text-[#6C757D]";
 
     const wordCount = trimmedDesc.split(/\s+/).length;
@@ -160,10 +163,8 @@ const CreateTaskForm = ({
                         </p>
 
                         <p
-                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
-                            field.value!,
-                            3,
-                            255
+                          className={`flex items-center gap-1 text-[10px] font-[350] ${generateDescValidation(
+                            field.value!
                           )}`}
                         >
                           <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო

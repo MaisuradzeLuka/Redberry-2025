@@ -42,13 +42,14 @@ const FormSelect = ({
           >
             {label}
           </FormLabel>
+
           <Dialog>
             <Select
               onValueChange={(value) => field.onChange(Number(value))}
               value={field.value !== undefined ? String(field.value) : ""}
               disabled={dissabled}
             >
-              <FormControl>
+              <FormControl className="">
                 <SelectTrigger
                   className={`w-full h-10 border-[#CED4DA] !ring-0 data-[state=open]:[&>*:last-child]:rotate-180 ${
                     form.formState.errors[name]
@@ -84,7 +85,7 @@ const FormSelect = ({
                 </SelectTrigger>
               </FormControl>
 
-              <SelectContent className="p-3">
+              <SelectContent className="!w-full border-[#DEE2E6]">
                 {isAgent ? (
                   <>
                     <DialogTrigger className="flex items-center gap-2 text-[16px] font-normal text-primaryPurple ml-2  border rounded-md border-none cursor-pointer mb-4 ">
@@ -96,7 +97,7 @@ const FormSelect = ({
                   ""
                 )}
 
-                <SelectGroup className="flex flex-col gap-3 items-start">
+                <SelectGroup className="!w-full flex flex-col gap-3 p-3 items-start">
                   {options.map((option) => (
                     <SelectItem value={String(option.id)} key={option.id}>
                       {"icon" in option && (

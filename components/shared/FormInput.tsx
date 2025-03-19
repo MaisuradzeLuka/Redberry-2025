@@ -29,8 +29,7 @@ const FormInput = ({ name, form, label, min, max }: FormInputType) => {
             <p
               className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
                 field.value,
-                min!,
-                max!
+                min!
               )}`}
             >
               <MdOutlineDone /> მინიმუმ {min} სიმბოლო
@@ -39,8 +38,7 @@ const FormInput = ({ name, form, label, min, max }: FormInputType) => {
             <p
               className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
                 field.value,
-                min!,
-                max!
+                min!
               )}`}
             >
               <MdOutlineDone /> მაქსიმუმ {max} სიმბოლო

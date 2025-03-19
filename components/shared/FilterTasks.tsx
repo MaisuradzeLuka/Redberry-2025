@@ -20,6 +20,7 @@ import Button from "./Button";
 import { trimDepartments } from "@/lib/utils";
 import { RxCross1 } from "react-icons/rx";
 import { LiaAngleDownSolid } from "react-icons/lia";
+import Image from "next/image";
 
 const FilterTasks = ({
   selectedDepartments,
@@ -28,11 +29,11 @@ const FilterTasks = ({
 }: FilterTasksType) => {
   const isFirstRender = useRef(true);
   const [filteredTaskTags, setFilteredTaskTags] = useState<
-    { id: number; name: string }[]
+    { id: number; name: string; filterName: string }[]
   >([]);
-  console.log(filteredTaskTags);
 
   const [searchUrl, setSearchUrl] = useState("");
+  const searchParams = new URLSearchParams(window.location.search);
 
   const [options, setOptions] = useState<{
     departments?: DepartmentsType[];
@@ -50,7 +51,6 @@ const FilterTasks = ({
     employees: selectedEmployees || [],
   });
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -73,13 +73,21 @@ const FilterTasks = ({
   useEffect(() => {
     const filterBySelected = (
       items: { id: number; name: string }[] | undefined,
-      selected: string[]
-    ) => items?.filter((item) => selected.includes(String(item.id))) || [];
+      selected: string[],
+      filterName: string
+    ) =>
+      items
+        ?.filter((item) => selected.includes(String(item.id)))
+        .map((item) => ({ ...item, filterName })) || [];
 
     setFilteredTaskTags([
-      ...filterBySelected(options.priorities, selectedPriorities),
-      ...filterBySelected(options.employees, selectedEmployees),
-      ...filterBySelected(options.departments, selectedDepartments),
+      ...filterBySelected(options.priorities, selectedPriorities, "priorities"),
+      ...filterBySelected(options.employees, selectedEmployees, "employees"),
+      ...filterBySelected(
+        options.departments,
+        selectedDepartments,
+        "departments"
+      ),
     ]);
   }, [options, selectedPriorities, selectedEmployees, selectedDepartments]);
 
@@ -112,44 +120,40 @@ const FilterTasks = ({
   };
 
   const applyFilters = () => {
-    const params = new URLSearchParams(searchParams);
+    const searchParams = new URLSearchParams(window.location.search);
 
     Object.entries(selectedFilters).forEach(([key, value]) => {
-      value.length
-        ? params.set(key, Array.from(value).join(","))
-        : params.delete(key);
+      value.length ? searchParams.set(key, value.toString()) : "";
     });
 
-    setSearchUrl(params.toString());
+    const newPath = `${window.location.pathname}?${searchParams.toString()}`;
+
+    router.push(newPath, { scroll: false });
   };
 
   const onClick = (clearPath: boolean, id?: number) => {
     if (clearPath) {
       setFilteredTaskTags([]);
+      setSelectedFilters({ departments: [], priorities: [], employees: [] });
       router.push(window.location.pathname, { scroll: false });
     }
   };
 
-  const removeParamValue = (
-    paramName: string,
-    valueToRemove: string | number
-  ) => {
-    const params = new URLSearchParams(window.location.search);
+  const removeParamValue = (paramName: string, valueToRemove: string) => {
+    const searchParams = new URLSearchParams(window.location.search);
 
-    const values = params.getAll(paramName);
+    const values = searchParams.get(paramName)?.split(",") || [];
 
     const updatedValues = values.filter((value) => value !== valueToRemove);
 
-    if (updatedValues.length > 0) {
-      params.delete(paramName);
-      updatedValues.forEach((value) => params.append(paramName, value));
-    } else {
-      params.delete(paramName);
+    searchParams.delete(paramName);
+
+    if (updatedValues.length) {
+      searchParams.append(paramName, updatedValues.toString());
     }
+    const newPath = `${window.location.pathname}?${searchParams.toString()}`;
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-
-    window.history.replaceState({}, "", newUrl);
+    router.push(newPath, { scroll: false });
   };
 
   return (
@@ -172,6 +176,7 @@ const FilterTasks = ({
             {options.departments?.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
                 <Checkbox
+                  className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
                   checked={selectedFilters.departments.includes(
                     String(item.id)
@@ -214,6 +219,7 @@ const FilterTasks = ({
             {options.priorities?.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
                 <Checkbox
+                  className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
                   checked={selectedFilters.priorities.includes(String(item.id))}
                   onCheckedChange={(checked) =>
@@ -228,7 +234,16 @@ const FilterTasks = ({
                   htmlFor={String(item.id)}
                   className="text-sm font-normal"
                 >
-                  {item.name}
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={item.icon}
+                      alt="priority icon"
+                      width={28}
+                      height={28}
+                      className=" w-7 h-7"
+                    />
+                    <span>{item.name}</span>
+                  </div>
                 </label>
               </div>
             ))}
@@ -252,8 +267,9 @@ const FilterTasks = ({
             className="flex flex-col gap-5 w-[600px] max-h-[300px] overflow-y-scroll px-8 py-10 bg-white border-primaryPurple !top-10"
           >
             {options.employees?.map((item) => (
-              <div key={item.id} className="flex items-center gap-3">
+              <div key={item.id} className="flex items-center gap-4">
                 <Checkbox
+                  className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
                   checked={selectedFilters.employees.includes(String(item.id))}
                   onCheckedChange={(checked) =>
@@ -264,11 +280,21 @@ const FilterTasks = ({
                     )
                   }
                 />
+
                 <label
                   htmlFor={String(item.id)}
                   className="text-sm font-normal"
                 >
-                  {item.name}
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={item.avatar}
+                      alt="employee avatar"
+                      width={28}
+                      height={28}
+                      className="rounded-full w-7 h-7"
+                    />
+                    <span>{item.name}</span>
+                  </div>
                 </label>
               </div>
             ))}
@@ -292,7 +318,7 @@ const FilterTasks = ({
               {trimDepartments(tag.name)}
               <button
                 className="cursor-pointer"
-                onClick={() => removeParamValue(tag.name, tag.id)}
+                onClick={() => removeParamValue(tag.filterName, String(tag.id))}
               >
                 <RxCross1 />
               </button>

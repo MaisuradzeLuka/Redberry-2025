@@ -7,12 +7,12 @@ import {
   DialogClose,
 } from "../ui/dialog";
 import { useForm } from "react-hook-form";
-import { Form } from "../ui/form";
+import { Form, FormMessage } from "../ui/form";
 import Button from "../shared/Button";
 import { agentSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { handleFileChange } from "@/lib/utils";
 import Image from "next/image";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -25,6 +25,7 @@ import { DepartmentsType } from "@/lib/types";
 const AgentModal = () => {
   const [image, setImage] = useState("");
   const [departments, setDepartments] = useState<DepartmentsType[]>([]);
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchDepartaments = async () => {
@@ -56,8 +57,11 @@ const AgentModal = () => {
     if (file)
       if (file.size > 600 * 1024) {
         form.setError("avatar", {
+          type: "custom",
           message: "ფოტოს ზომა აღემატება 600 კილობაიტს",
         });
+
+        return;
       }
 
     const image = await handleFileChange(file);
@@ -91,6 +95,7 @@ const AgentModal = () => {
     if (res === "SUCCESS") {
       form.reset();
       setImage("");
+      dialogCloseRef.current?.click();
     }
   };
 
@@ -133,7 +138,7 @@ const AgentModal = () => {
           <div className="w-full flex flex-col gap-2">
             <label
               htmlFor="avatar"
-              className="text-sm text-[#343A40] font-medium border-none"
+              className="w-min text-sm text-[#343A40] font-medium border-none"
             >
               ავატარი*
             </label>
@@ -170,6 +175,11 @@ const AgentModal = () => {
               )}
             </label>
 
+            {form.formState.errors.avatar?.message && (
+              <p className="text-[10px] text-red">
+                {form.formState.errors.avatar?.message}
+              </p>
+            )}
             <input
               type="file"
               id="avatar"
@@ -188,7 +198,9 @@ const AgentModal = () => {
             />
           </div>
 
-          <div className="self-end mt-2">
+          <div className="flex gap-4 self-end mt-2">
+            <DialogClose ref={dialogCloseRef} className="hidden" />
+
             <DialogClose className="text-[16px] px-5 py-3 border rounded-md border-primaryPurple mr-5">
               გაუქმება
             </DialogClose>
