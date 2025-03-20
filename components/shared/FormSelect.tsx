@@ -89,8 +89,8 @@ const FormSelect = ({
               <SelectContent className="!w-full border-[#DEE2E6]">
                 {isAgent ? (
                   <>
-                    <DialogTrigger className="flex items-center gap-2 text-[16px] font-normal text-primaryPurple ml-2  border rounded-md border-none cursor-pointer mb-4 ">
-                      <GoPlusCircle className="text-lg" />
+                    <DialogTrigger className="flex items-center gap-2 text-[16px] font-normal text-primaryPurple ml-2  border rounded-md border-none cursor-pointer pl-4 pt-4">
+                      <GoPlusCircle className="text-xl" />
                       დაამატე თანამშრომელი
                     </DialogTrigger>
                   </>
