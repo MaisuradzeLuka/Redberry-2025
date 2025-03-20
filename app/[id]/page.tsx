@@ -47,7 +47,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
           <span
             className={`px-2 py-1 bg-pink rounded-2xl ml-2 h-min text-white`}
           >
-            {trimDepartments(task.department.name)}
+            {trimDepartments(task.department.name).name}
           </span>
         </div>
 
