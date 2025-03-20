@@ -1,16 +1,32 @@
 import { z } from "zod";
 
-const nameSurnameRegex = /^[a-zA-Zა-ჰ]+$/;
+const nameSurnameRegex = /^[a-zA-Zა-ჰ\s]+$/;
 
 export const agentSchema = z.object({
-  name: z.string().min(2).max(255).regex(nameSurnameRegex),
-  surname: z.string().min(2).max(255).regex(nameSurnameRegex),
+  name: z
+    .string()
+    .min(2)
+    .max(255)
+    .regex(nameSurnameRegex)
+    .refine((val) => val.trim().replace(/\s+/g, "").length > 1),
+
+  surname: z
+    .string()
+    .min(2)
+    .max(255)
+    .regex(nameSurnameRegex)
+    .refine((val) => val.trim().replace(/\s+/g, "").length > 1),
+
   avatar: z.string().nonempty({ message: "ფოტოს ატვირთვა აუცილებელია" }),
   department_id: z.number(),
 });
 
 export const taskSchema = z.object({
-  name: z.string().min(3).max(255),
+  name: z
+    .string()
+    .min(3)
+    .max(255)
+    .refine((val) => val.trim().replace(/\s+/g, "").length > 2),
   description: z
     .string()
     .max(255)

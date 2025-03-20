@@ -13,7 +13,7 @@ import {
   FilterTasksType,
   PrioritiesType,
 } from "@/lib/types";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import Button from "./Button";
@@ -24,16 +24,19 @@ import Image from "next/image";
 
 const FilterTasks = ({
   selectedDepartments,
-  selectedEmployees,
+  selectedEmployee,
   selectedPriorities,
 }: FilterTasksType) => {
   const isFirstRender = useRef(true);
   const [filteredTaskTags, setFilteredTaskTags] = useState<
-    { id: number; name: string; filterName: string }[]
+    {
+      id: number;
+      name: string;
+      filterName: "departments" | "priorities" | "employee";
+    }[]
   >([]);
 
   const [searchUrl, setSearchUrl] = useState("");
-  const searchParams = new URLSearchParams(window.location.search);
 
   const [options, setOptions] = useState<{
     departments?: DepartmentsType[];
@@ -41,14 +44,24 @@ const FilterTasks = ({
     employees?: EmployeesType[];
   }>({});
 
-  const [selectedFilters, setSelectedFilters] = useState<{
+  const [tempSelectedFilters, setTempSelectedFilters] = useState<{
     departments: string[];
     priorities: string[];
-    employees: string[];
+    employee: string;
   }>({
     departments: selectedDepartments || [],
     priorities: selectedPriorities || [],
-    employees: selectedEmployees || [],
+    employee: selectedEmployee || "",
+  });
+
+  const [selectedFilters, setSelectedFilters] = useState<{
+    departments: string[];
+    priorities: string[];
+    employee: string;
+  }>({
+    departments: selectedDepartments || [],
+    priorities: selectedPriorities || [],
+    employee: selectedEmployee,
   });
   const router = useRouter();
 
@@ -73,8 +86,8 @@ const FilterTasks = ({
   useEffect(() => {
     const filterBySelected = (
       items: { id: number; name: string }[] | undefined,
-      selected: string[],
-      filterName: string
+      selected: string[] | string,
+      filterName: "departments" | "priorities" | "employee"
     ) =>
       items
         ?.filter((item) => selected.includes(String(item.id)))
@@ -82,14 +95,14 @@ const FilterTasks = ({
 
     setFilteredTaskTags([
       ...filterBySelected(options.priorities, selectedPriorities, "priorities"),
-      ...filterBySelected(options.employees, selectedEmployees, "employees"),
+      ...filterBySelected(options.employees, selectedEmployee, "employee"),
       ...filterBySelected(
         options.departments,
         selectedDepartments,
         "departments"
       ),
     ]);
-  }, [options, selectedPriorities, selectedEmployees, selectedDepartments]);
+  }, [options, selectedPriorities, selectedEmployee, selectedDepartments]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -102,44 +115,60 @@ const FilterTasks = ({
     });
   }, [searchUrl]);
 
-  const handleCheckboxChange = (
-    name: keyof typeof selectedFilters,
+  const handleTempCheckboxChange = (
+    filterType: "departments" | "priorities" | "employee",
     id: number,
     checked: boolean
   ) => {
-    setSelectedFilters((prev) => {
-      const updatedArray = checked
-        ? [...prev[name], String(id)]
-        : prev[name].filter((param) => param !== String(id));
-
-      return {
-        ...prev,
-        [name]: updatedArray,
-      };
-    });
+    setTempSelectedFilters((prev) => ({
+      ...prev,
+      [filterType]:
+        filterType === "employee"
+          ? checked
+            ? String(id)
+            : ""
+          : checked
+          ? [...prev[filterType], String(id)]
+          : prev[filterType].filter((item) => item !== String(id)),
+    }));
   };
+  const applyFilters = (type: "departments" | "employee" | "priorities") => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [type]: tempSelectedFilters[type],
+    }));
 
-  const applyFilters = () => {
     const searchParams = new URLSearchParams(window.location.search);
 
-    Object.entries(selectedFilters).forEach(([key, value]) => {
-      value.length ? searchParams.set(key, value.toString()) : "";
+    Object.entries({
+      ...selectedFilters,
+      [type]: tempSelectedFilters[type],
+    }).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length) {
+        searchParams.set(key, value.join(","));
+      } else if (value && typeof value === "string") {
+        searchParams.set(key, value);
+      } else {
+        searchParams.delete(key);
+      }
     });
 
     const newPath = `${window.location.pathname}?${searchParams.toString()}`;
-
     router.push(newPath, { scroll: false });
   };
 
-  const onClick = (clearPath: boolean, id?: number) => {
-    if (clearPath) {
-      setFilteredTaskTags([]);
-      setSelectedFilters({ departments: [], priorities: [], employees: [] });
-      router.push(window.location.pathname, { scroll: false });
-    }
+  const onClick = () => {
+    router.push(window.location.pathname, { scroll: false });
+    router.push(window.location.pathname, { scroll: false });
+    setFilteredTaskTags([]);
+    setSelectedFilters({ departments: [], priorities: [], employee: "" });
+    setTempSelectedFilters({ departments: [], priorities: [], employee: "" });
   };
 
-  const removeParamValue = (paramName: string, valueToRemove: string) => {
+  const removeParamValue = (
+    paramName: "departments" | "priorities" | "employee",
+    valueToRemove: string
+  ) => {
     const searchParams = new URLSearchParams(window.location.search);
 
     const values = searchParams.get(paramName)?.split(",") || [];
@@ -151,9 +180,30 @@ const FilterTasks = ({
     if (updatedValues.length) {
       searchParams.append(paramName, updatedValues.toString());
     }
+
     const newPath = `${window.location.pathname}?${searchParams.toString()}`;
 
     router.push(newPath, { scroll: false });
+
+    setFilteredTaskTags((prev) =>
+      prev.filter((tag) => tag.id !== Number(valueToRemove))
+    );
+
+    setTempSelectedFilters((prev) => ({
+      ...prev,
+      [paramName]:
+        paramName === "employee"
+          ? ""
+          : prev[paramName].filter((item) => item !== valueToRemove),
+    }));
+
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [paramName]:
+        paramName === "employee"
+          ? ""
+          : prev[paramName].filter((item) => item !== valueToRemove),
+    }));
   };
 
   return (
@@ -178,11 +228,11 @@ const FilterTasks = ({
                 <Checkbox
                   className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
-                  checked={selectedFilters.departments.includes(
+                  checked={tempSelectedFilters.departments.includes(
                     String(item.id)
                   )}
                   onCheckedChange={(checked) =>
-                    handleCheckboxChange(
+                    handleTempCheckboxChange(
                       "departments",
                       item.id,
                       checked as boolean
@@ -198,7 +248,7 @@ const FilterTasks = ({
               </div>
             ))}
             <Button
-              onClick={applyFilters}
+              onClick={() => applyFilters("departments")}
               classname="bg-primaryPurple text-white !rounded-full w-max self-end"
             >
               არჩევა
@@ -221,9 +271,11 @@ const FilterTasks = ({
                 <Checkbox
                   className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
-                  checked={selectedFilters.priorities.includes(String(item.id))}
+                  checked={tempSelectedFilters.priorities.includes(
+                    String(item.id)
+                  )}
                   onCheckedChange={(checked) =>
-                    handleCheckboxChange(
+                    handleTempCheckboxChange(
                       "priorities",
                       item.id,
                       checked as boolean
@@ -248,7 +300,7 @@ const FilterTasks = ({
               </div>
             ))}
             <Button
-              onClick={applyFilters}
+              onClick={() => applyFilters("priorities")}
               classname="bg-primaryPurple text-white !rounded-full w-max self-end"
             >
               არჩევა
@@ -271,10 +323,10 @@ const FilterTasks = ({
                 <Checkbox
                   className="w-[22px] h-[22px] rounded-md text-[#212529] border-[#212529]"
                   id={String(item.id)}
-                  checked={selectedFilters.employees.includes(String(item.id))}
+                  checked={tempSelectedFilters.employee === String(item.id)}
                   onCheckedChange={(checked) =>
-                    handleCheckboxChange(
-                      "employees",
+                    handleTempCheckboxChange(
+                      "employee",
                       item.id,
                       checked as boolean
                     )
@@ -299,7 +351,7 @@ const FilterTasks = ({
               </div>
             ))}
             <Button
-              onClick={applyFilters}
+              onClick={() => applyFilters("employee")}
               classname="bg-primaryPurple text-white !rounded-full w-max self-end"
             >
               არჩევა
@@ -315,7 +367,7 @@ const FilterTasks = ({
               key={index}
               className="w-max flex items-center gap-2 border border-[#CED4DA] text-sm px-3 py-1 rounded-full"
             >
-              {trimDepartments(tag.name)}
+              {trimDepartments(tag.name).name}
               <button
                 className="cursor-pointer"
                 onClick={() => removeParamValue(tag.filterName, String(tag.id))}
@@ -325,7 +377,7 @@ const FilterTasks = ({
             </li>
           ))}
 
-          <button className="cursor-pointer ml-4" onClick={() => onClick(true)}>
+          <button className="cursor-pointer ml-4" onClick={onClick}>
             გასუფთავება
           </button>
         </ul>

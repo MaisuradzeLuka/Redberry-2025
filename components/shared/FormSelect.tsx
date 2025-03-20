@@ -31,6 +31,8 @@ const FormSelect = ({
     render={({ field }) => {
       const selectedOption = options.find((option) => option.id == field.value);
 
+      const error = form.formState.errors[name];
+
       return (
         <FormItem
           className={`self-start w-full flex flex-col gap-2 ${className}`}
@@ -42,7 +44,6 @@ const FormSelect = ({
           >
             {label}
           </FormLabel>
-
           <Dialog>
             <Select
               onValueChange={(value) => field.onChange(Number(value))}
@@ -52,7 +53,7 @@ const FormSelect = ({
               <FormControl className="">
                 <SelectTrigger
                   className={`w-full h-10 border-[#CED4DA] !ring-0 data-[state=open]:[&>*:last-child]:rotate-180 ${
-                    form.formState.errors[name]
+                    error
                       ? "border-red"
                       : form.getFieldState(name).isDirty
                       ? "border-green-500"
@@ -128,6 +129,7 @@ const FormSelect = ({
 
             <AgentModal />
           </Dialog>
+          {error && <p className="text-[10px] text-red">სავალდებულო</p>}
         </FormItem>
       );
     }}

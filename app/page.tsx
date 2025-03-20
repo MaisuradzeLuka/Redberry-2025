@@ -10,13 +10,14 @@ export default async function Home({
   searchParams: Promise<{
     departments?: string;
     priorities?: string;
-    employees?: string;
+    employee?: string;
   }>;
 }) {
   const tasks: TaskType[] = (await fetchData("tasks")) || [];
 
   const selectedPriorities = (await searchParams).priorities?.split(",") || [];
-  const selectedEmployees = (await searchParams).employees?.split(",") || [];
+  const selectedEmployee = (await searchParams).employee || "";
+
   const selectedDepartments =
     (await searchParams).departments?.split(",") || [];
 
@@ -30,8 +31,8 @@ export default async function Home({
       selectedPriorities.includes(String(task.priority.id));
 
     const matchesEmployee =
-      selectedEmployees.length === 0 ||
-      selectedEmployees.includes(String(task.employee.id));
+      selectedEmployee === "" ||
+      selectedEmployee.includes(String(task.employee.id));
 
     return matchesDepartment && matchesPriority && matchesEmployee;
   });
@@ -42,7 +43,7 @@ export default async function Home({
 
       <FilterTasks
         selectedDepartments={selectedDepartments}
-        selectedEmployees={selectedEmployees}
+        selectedEmployee={selectedEmployee}
         selectedPriorities={selectedPriorities}
       />
 

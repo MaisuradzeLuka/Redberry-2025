@@ -30,10 +30,35 @@ export const handleFileChange = (fileProp: File | undefined) => {
   });
 };
 
-export const generateValidationStyles = (value: string, min: number) => {
-  if (!value) return "text-[#6C757D]";
-  if (value.trim().length < min || value.trim().length > 255) return "text-red";
-  return "text-green-500";
+export const generateValidationStyles = (
+  isDirty: boolean,
+  value: string,
+  min: number,
+  type: "min" | "max" | "letters"
+) => {
+  const trimmedValue = value.trim();
+
+  if (isDirty) {
+    if (type === "min") {
+      return value.replace(/\s/g, "").length < min
+        ? "!text-red"
+        : "!text-green-500";
+    }
+
+    if (type === "max") {
+      return value.replace(/\s/g, "").length > 255 || trimmedValue.length === 0
+        ? "!text-red"
+        : "!text-green-500";
+    }
+
+    if (type === "letters") {
+      return /^[a-zA-Zა-ჰ\s]+$/.test(trimmedValue)
+        ? "!text-green-500"
+        : "!text-red";
+    }
+  }
+
+  return "text-[#6C757D]";
 };
 
 export const formatDate = (isoString: string, shortFormat: boolean = false) => {
@@ -61,28 +86,28 @@ export const formatDate = (isoString: string, shortFormat: boolean = false) => {
 export const trimDepartments = (department: string) => {
   switch (department) {
     case "მედიის დეპარტამენტი":
-      return "მედია";
+      return { name: "მედია", color: "bg-purple-500" };
 
     case "ტექნოლოგიების დეპარტამენტი":
-      return "ინფ. ტექ.";
+      return { name: "ინფ. ტექ.", color: "bg-blue-500" };
 
     case "ლოჯოსტიკის დეპარტამენტი":
-      return "ლოჯისტიკა";
+      return { name: "ლოჯისტიკა", color: "bg-green-500" };
 
     case "გაყიდვები და მარკეტინგის დეპარტამენტი":
-      return "მარკეტინგი";
+      return { name: "მარკეტინგი", color: "bg-yellow-500" };
 
     case "ფინანსების დეპარტამენტი":
-      return "ფინანსები";
+      return { name: "ფინანსები", color: "bg-red-500" };
 
     case "ადამიანური რესურსების დეპარტამენტი":
-      return "ადმნ. რეს.";
+      return { name: "ადმნ. რეს.", color: "bg-pink-500" };
 
     case "ადმინისტრაციის დეპარტამენტი":
-      return "ადმინისტრაცია";
+      return { name: "ადმინისტრაცია", color: "bg-gray-500" };
 
     default:
-      return department;
+      return { name: department, color: "" };
   }
 };
 

@@ -105,19 +105,19 @@ const CreateTaskForm = ({
     }
   };
 
-  const generateDescValidation = (desc: string) => {
+  const generateDescValidation = (desc: string, type: "min" | "max") => {
     const trimmedDesc = desc.trim();
+    const wordCount = trimmedDesc ? trimmedDesc.split(/\s+/).length : 0;
+    const charCount = desc.replace(/\s/g, "").length;
+    const isDirty = form.getFieldState("description").isDirty;
 
-    if (trimmedDesc === "" && form.getFieldState("description").isDirty)
-      return "text-red";
+    if (!isDirty) return "text-[#6C757D]";
 
-    if (trimmedDesc === "") return "text-[#6C757D]";
+    if (type === "min") return wordCount < 4 ? "text-red" : "text-green-500";
+    if (type === "max")
+      return charCount > 255 || charCount === 0 ? "text-red" : "text-green-500";
 
-    const wordCount = trimmedDesc.split(/\s+/).length;
-
-    if (wordCount < 4 || trimmedDesc.length > 255) return "text-red";
-
-    return "text-green-500";
+    return "text-[#6C757D]";
   };
 
   return (
@@ -156,7 +156,8 @@ const CreateTaskForm = ({
                       <div>
                         <p
                           className={`flex items-center gap-1 text-[10px] font-[350] ${generateDescValidation(
-                            field.value!
+                            field.value!,
+                            "min"
                           )}`}
                         >
                           <MdOutlineDone /> მინიმუმ 4 სიტყვა
@@ -164,7 +165,8 @@ const CreateTaskForm = ({
 
                         <p
                           className={`flex items-center gap-1 text-[10px] font-[350] ${generateDescValidation(
-                            field.value!
+                            field.value!,
+                            "max"
                           )}`}
                         >
                           <MdOutlineDone /> მაქსიმუმ 255 სიმბოლო

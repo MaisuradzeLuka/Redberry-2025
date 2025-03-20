@@ -6,40 +6,40 @@ import Navbar from "@/components/shared/Navbar";
 // const firaGo = localFont({
 //   src: [
 //     {
-//       path: "./fonts/FiraGo-Light.ttf",
-//       weight: "300",
-//       style: "normal",
-//     },
-//     {
-//       path: "./fonts/FiraGo-ExtraLight.ttf",
-//       weight: "350",
-//       style: "normal",
-//     },
-//     {
-//       path: "./fonts/FiraGo-Regular.ttf",
+//       path: "/public/fonts/girago-regular.otf",
 //       weight: "400",
-//       style: "normal",
+//       style: "regular",
 //     },
-//     {
-//       path: "./fonts/FiraGo-Medium.ttf",
-//       weight: "500",
-//       style: "normal",
-//     },
-//     {
-//       path: "./fonts/FiraGo-SemiBold.ttf",
-//       weight: "600",
-//       style: "normal",
-//     },
-//     {
-//       path: "./fonts/FiraGo-Bold.ttf",
-//       weight: "700",
-//       style: "normal",
-//     },
-//     {
-//       path: "./fonts/FiraGo-Black.ttf",
-//       weight: "900",
-//       style: "normal",
-//     },
+//     // {
+//     //   path: "./fonts/FiraGo-ExtraLight.ttf",
+//     //   weight: "350",
+//     //   style: "normal",
+//     // },
+//     // {
+//     //   path: "./fonts/FiraGo-Regular.ttf",
+//     //   weight: "400",
+//     //   style: "normal",
+//     // },
+//     // {
+//     //   path: "./fonts/FiraGo-Medium.ttf",
+//     //   weight: "500",
+//     //   style: "normal",
+//     // },
+//     // {
+//     //   path: "./fonts/FiraGo-SemiBold.ttf",
+//     //   weight: "600",
+//     //   style: "normal",
+//     // },
+//     // {
+//     //   path: "./fonts/FiraGo-Bold.ttf",
+//     //   weight: "700",
+//     //   style: "normal",
+//     // },
+//     // {
+//     //   path: "./fonts/FiraGo-Black.ttf",
+//     //   weight: "900",
+//     //   style: "normal",
+//     // },
 //   ],
 // });
 

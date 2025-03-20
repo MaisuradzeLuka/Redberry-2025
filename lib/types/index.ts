@@ -13,6 +13,7 @@ export type FormInputType = {
   label: string;
   min?: number;
   max?: number;
+  letters?: boolean;
 };
 
 export type DepartmentsType = {
@@ -101,6 +102,6 @@ export type CommentsType = {
 
 export type FilterTasksType = {
   selectedDepartments: string[];
-  selectedEmployees: string[];
+  selectedEmployee: string;
   selectedPriorities: string[];
 };

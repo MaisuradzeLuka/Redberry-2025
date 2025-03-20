@@ -125,6 +125,7 @@ const AgentModal = () => {
               label="სახელი*"
               min={2}
               max={255}
+              letters={true}
             />
             <FormInput
               name="surname"
@@ -132,6 +133,7 @@ const AgentModal = () => {
               label="გვარი*"
               min={2}
               max={255}
+              letters={true}
             />
           </div>
 

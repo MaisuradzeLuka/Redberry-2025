@@ -3,8 +3,18 @@ import { MdOutlineDone } from "react-icons/md";
 import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { FormInputType } from "@/lib/types";
+import { useEffect } from "react";
 
-const FormInput = ({ name, form, label, min, max }: FormInputType) => {
+const FormInput = ({
+  name,
+  form,
+  label,
+  min,
+  max,
+  letters = false,
+}: FormInputType) => {
+  const error = form.formState.errors[name];
+
   return (
     <FormField
       control={form.control}
@@ -19,7 +29,7 @@ const FormInput = ({ name, form, label, min, max }: FormInputType) => {
             <Input
               type="text"
               className={`w-full h-10 border-[#CED4DA] !ring-0 ${
-                form.formState.errors[name] && "border-red"
+                error && "border-red"
               }`}
               {...field}
             />
@@ -27,22 +37,45 @@ const FormInput = ({ name, form, label, min, max }: FormInputType) => {
 
           <div>
             <p
-              className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
+              className={`flex items-center gap-1 text-[10px] font-[350] ${
+                error && "text-red"
+              } ${generateValidationStyles(
+                form.getFieldState(name).isDirty,
                 field.value,
-                min!
+                min!,
+                "min"
               )}`}
             >
-              <MdOutlineDone /> მინიმუმ {min} სიმბოლო
+              <MdOutlineDone /> მინიმუმ {min} სიმბოლი
             </p>
 
             <p
-              className={`flex items-center gap-1 text-[10px] font-[350] ${generateValidationStyles(
+              className={`flex items-center gap-1 text-[10px] font-[350] ${
+                error && "text-red"
+              } ${generateValidationStyles(
+                form.getFieldState(name).isDirty,
                 field.value,
-                min!
+                min!,
+                "max"
               )}`}
             >
-              <MdOutlineDone /> მაქსიმუმ {max} სიმბოლო
+              <MdOutlineDone /> მაქსიმუმ {max} სიმბოლი
             </p>
+
+            {letters && (
+              <p
+                className={`flex items-center gap-1 text-[10px] font-[350] ${
+                  error && "text-red"
+                } ${generateValidationStyles(
+                  form.getFieldState(name).isDirty,
+                  field.value,
+                  min!,
+                  "letters"
+                )}`}
+              >
+                <MdOutlineDone /> მხოლოდ ქართული ან ლათინური ასოები
+              </p>
+            )}
           </div>
         </FormItem>
       )}

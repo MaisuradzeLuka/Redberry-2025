@@ -2,7 +2,7 @@ import CommentForm from "@/components/forms/CommentForm";
 import ChangeStatus from "@/components/shared/ChangeStatus";
 import CommentCard from "@/components/shared/CommentCard";
 import { fetchData } from "@/lib/actions";
-import { priorities, TaskType, CommentsType } from "@/lib/types";
+import { TaskType, CommentsType, PrioritiesType } from "@/lib/types";
 import { formatDate, trimDepartments } from "@/lib/utils";
 import Image from "next/image";
 import { LuCalendar, LuUser } from "react-icons/lu";
@@ -11,7 +11,7 @@ import { RiPieChartLine } from "react-icons/ri";
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
   const task: TaskType = (await fetchData(`tasks/${id}`)) || [];
-  const statuses: priorities[] = (await fetchData("statuses")) || [];
+  const statuses: PrioritiesType[] = (await fetchData("statuses")) || [];
   const comments: CommentsType[] =
     (await fetchData(`tasks/${id}/comments`)) || [];
 

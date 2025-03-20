@@ -33,6 +33,10 @@ const TaskCard = ({
       ? "border-yellow text-yellow"
       : "border-red text-red";
 
+  const { name: trimmedDept, color: deptColor } = trimDepartments(
+    department.name
+  );
+
   return (
     <Link
       href={`${id}`}
@@ -51,10 +55,9 @@ const TaskCard = ({
           {priority.name}
         </span>
 
-        <span className={`px-2 py-1 bg-blue rounded-2xl ml-2 text-white`}>
-          {trimDepartments(department.name)}
+        <span className={`px-2 py-1 ${deptColor} rounded-2xl ml-2 text-white`}>
+          {trimmedDept}
         </span>
-
         <span className=" text-[#212529] ml-auto">{formatDate(due_date)}</span>
       </div>
 
